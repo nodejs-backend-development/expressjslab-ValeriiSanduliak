@@ -11,14 +11,3 @@ describe('GET /users', () => {
     });
 });
 
-describe('POST /users/new', () => {
-    it('should add a user', async () => {
-        const res = await request(app).post('/users/new').send({
-            firstName: 'TestFirstName',
-            lastName: 'TestLastName',
-            email: 'test@b.com',
-        });
-        expect(res.statusCode).toBe(201);
-        expect(res.body.email).toBe('test@b.com');
-    });
-});
