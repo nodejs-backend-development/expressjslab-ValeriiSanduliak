@@ -10,4 +10,3 @@ describe('GET /users', () => {
         expect(res.body.length).toBeGreaterThan(0);
     });
 });
-
