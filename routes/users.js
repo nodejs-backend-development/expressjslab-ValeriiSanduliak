@@ -10,14 +10,13 @@ const {
 const router = express.Router();
 
 /* GET users listing. */
-router.get('/users', getUsers);
+router.get('/', getUsers);
 
-router.post('/users', createUser);
+router.post('/', createUser);
 
-router.get('/users/:id', getUserById);
+router.get('/:id', getUserById);
 
-router.put('/users/:id', updateUser);
-router.delete('/users/:id', deleteUser);
-// router.post('/new', addUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
 module.exports = router;
