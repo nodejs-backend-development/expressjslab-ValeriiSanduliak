@@ -48,10 +48,9 @@ const updateUser = async (req, res) => {
     }
 };
 const deleteUser = async (req, res) => {
-    const { id } = req.params;
     try {
+        const { id } = req.params;
         await makeRequest(`${url}/users/${id}`, 'DELETE', null);
-        console.log(makeRequest.status);
         res.status(200).send('User delete');
     } catch (error) {
         res.status(500).send('Error deleting user');
