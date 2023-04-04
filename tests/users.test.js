@@ -88,7 +88,7 @@ describe('POST /users', () => {
 
         const res = await request(app).post('/users').send(newUser);
 
-        expect(res.statusCode).toBe(200);
+        expect(res.statusCode).toBe(201);
         expect(res.body).toStrictEqual(createdUser);
         expect(makeRequest).toHaveBeenCalledTimes(1);
         expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'POST', JSON.stringify(newUser));
@@ -171,7 +171,7 @@ describe('DELETE /users/:id', () => {
 
         const res = await request(app).delete(`/users/${uid}`);
 
-        expect(res.statusCode).toBe(200);
+        expect(res.statusCode).toBe(202);
         expect(res.text).toBe('User delete');
         expect(makeRequest).toHaveBeenCalledTimes(1);
         expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${uid}`, 'DELETE', null);

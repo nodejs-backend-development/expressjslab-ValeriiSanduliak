@@ -27,7 +27,7 @@ const createUser = async (req, res) => {
             'POST',
             JSON.stringify({ name, email, gender, status }),
         );
-        res.status(200).json(userData);
+        res.status(201).json(userData);
     } catch (error) {
         res.status(500).send('Error creating user');
     }
@@ -51,7 +51,7 @@ const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
         await makeRequest(`${url}/users/${id}`, 'DELETE', null);
-        res.status(200).send('User delete');
+        res.status(202).send('User delete');
     } catch (error) {
         res.status(500).send('Error deleting user');
     }
