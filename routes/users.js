@@ -6,17 +6,18 @@ const {
     updateUser,
     deleteUser,
 } = require('../controllers/users.controller');
+const { checkAuth } = require('../middleware/checkAuth');
 
 const router = express.Router();
 
 /* GET users listing. */
-router.get('/', getUsers);
+router.get('/', checkAuth, getUsers);
 
-router.post('/', createUser);
+router.post('/', checkAuth, createUser);
 
-router.get('/:id', getUserById);
+router.get('/:id', checkAuth, getUserById);
 
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
+router.put('/:id', checkAuth, updateUser);
+router.delete('/:id', checkAuth, deleteUser);
 
 module.exports = router;

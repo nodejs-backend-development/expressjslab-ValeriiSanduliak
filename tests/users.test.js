@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../app');
-const { url } = require('../global_keys/keys');
+const { url, token } = require('../global_keys/keys');
 const { makeRequest } = require('../clients/httpClient');
 require('dotenv').config();
 
@@ -14,11 +14,14 @@ describe('GET /users', () => {
         const user = {
             id: '1',
             name: 'myName',
+            email: 'test@example.com',
+            gender: 'male',
+            status: 'active',
         };
 
         makeRequest.mockResolvedValueOnce([user]);
 
-        const res = await request(app).get('/users');
+        const res = await request(app).get('/users').set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(200);
         expect(res.body.length).toBeGreaterThan(0);
@@ -29,7 +32,7 @@ describe('GET /users', () => {
     it('should handle errors getUsers', async () => {
         makeRequest.mockRejectedValueOnce(new Error('Users not found'));
 
-        const res = await request(app).get('/users');
+        const res = await request(app).get('/users').set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error getting users');
@@ -46,10 +49,15 @@ describe('GET /users/:id', () => {
         const user = {
             id: userId,
             name: 'myName',
+            email: 'test@example.com',
+            gender: 'male',
+            status: 'active',
         };
         makeRequest.mockResolvedValueOnce(user);
 
-        const res = await request(app).get(`/users/${userId}`);
+        const res = await request(app)
+            .get(`/users/${userId}`)
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(200);
         expect(res.body).toStrictEqual(user);
@@ -61,7 +69,9 @@ describe('GET /users/:id', () => {
         const userId = '2';
         makeRequest.mockRejectedValueOnce(new Error('User not found'));
 
-        const res = await request(app).get(`/users/${userId}`);
+        const res = await request(app)
+            .get(`/users/${userId}`)
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error getting user with id');
@@ -86,7 +96,10 @@ describe('POST /users', () => {
         };
         makeRequest.mockResolvedValueOnce(createdUser);
 
-        const res = await request(app).post('/users').send(newUser);
+        const res = await request(app)
+            .post('/users')
+            .send(newUser)
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(201);
         expect(res.body).toStrictEqual(createdUser);
@@ -103,7 +116,10 @@ describe('POST /users', () => {
         };
         makeRequest.mockRejectedValueOnce(new Error('Create failed'));
 
-        const res = await request(app).post('/users').send(newUser);
+        const res = await request(app)
+            .post('/users')
+            .send(newUser)
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error creating user');
@@ -124,7 +140,10 @@ describe('PUT /users/:id', () => {
             status: 'inactive',
         };
         makeRequest.mockResolvedValueOnce(updatedUser);
-        const res = await request(app).put(`/users/${id}`).send(updatedUser);
+        const res = await request(app)
+            .put(`/users/${id}`)
+            .send(updatedUser)
+            .set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(200);
         expect(res.body).toEqual(updatedUser);
         expect(makeRequest).toHaveBeenCalledTimes(1);
@@ -145,7 +164,10 @@ describe('PUT /users/:id', () => {
 
         makeRequest.mockRejectedValueOnce(new Error('Update failed'));
 
-        const res = await request(app).put(`/users/${id}`).send(updatedUser);
+        const res = await request(app)
+            .put(`/users/${id}`)
+            .send(updatedUser)
+            .set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error updating user with id');
 
@@ -166,10 +188,15 @@ describe('DELETE /users/:id', () => {
         const user = {
             id: uid,
             name: 'myName',
+            email: 'test@example.com',
+            gender: 'male',
+            status: 'active',
         };
         makeRequest.mockResolvedValueOnce(user);
 
-        const res = await request(app).delete(`/users/${uid}`);
+        const res = await request(app)
+            .delete(`/users/${uid}`)
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(202);
         expect(res.text).toBe('User delete');
@@ -177,11 +204,13 @@ describe('DELETE /users/:id', () => {
         expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${uid}`, 'DELETE', null);
     });
 
-    it('should handle errors', async () => {
+    it('should handle errors delete user', async () => {
         const uid = '1';
         makeRequest.mockRejectedValueOnce(new Error('Network Error'));
 
-        const res = await request(app).delete(`/users/${uid}`);
+        const res = await request(app)
+            .delete(`/users/${uid}`)
+            .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error deleting user');
