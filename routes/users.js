@@ -10,14 +10,14 @@ const { checkAuth } = require('../middleware/checkAuth');
 
 const router = express.Router();
 
-/* GET users listing. */
-router.get('/', checkAuth, getUsers);
+router.use(checkAuth);
+router.get('/', getUsers);
 
-router.post('/', checkAuth, createUser);
+router.post('/', createUser);
 
-router.get('/:id', checkAuth, getUserById);
+router.get('/:id', getUserById);
 
-router.put('/:id', checkAuth, updateUser);
-router.delete('/:id', checkAuth, deleteUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
 module.exports = router;

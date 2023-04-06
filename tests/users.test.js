@@ -5,20 +5,25 @@ const { makeRequest } = require('../clients/httpClient');
 require('dotenv').config();
 
 jest.mock('../clients/httpClient');
-
+const userId = '1';
+const user = {
+    id: userId,
+    name: 'userName',
+    email: 'user@example.com',
+    gender: 'male',
+    status: 'active',
+};
+const user2 = {
+    name: 'user2Name',
+    email: 'user2@example.com',
+    gender: 'female',
+    status: 'inactive',
+};
+afterEach(() => {
+    jest.clearAllMocks();
+});
 describe('GET /users', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
     it('should getUsers', async () => {
-        const user = {
-            id: '1',
-            name: 'myName',
-            email: 'test@example.com',
-            gender: 'male',
-            status: 'active',
-        };
-
         makeRequest.mockResolvedValueOnce([user]);
 
         const res = await request(app).get('/users').set('Authorization', `Bearer ${token}`);
@@ -27,7 +32,7 @@ describe('GET /users', () => {
         expect(res.body.length).toBeGreaterThan(0);
         expect(res.body).toStrictEqual([user]);
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'GET', null);
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'GET');
     });
     it('should handle errors getUsers', async () => {
         makeRequest.mockRejectedValueOnce(new Error('Users not found'));
@@ -37,22 +42,11 @@ describe('GET /users', () => {
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error getting users');
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'GET', null);
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'GET');
     });
 });
 describe('GET /users/:id', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
     it('should getUser by id', async () => {
-        const userId = '1';
-        const user = {
-            id: userId,
-            name: 'myName',
-            email: 'test@example.com',
-            gender: 'male',
-            status: 'active',
-        };
         makeRequest.mockResolvedValueOnce(user);
 
         const res = await request(app)
@@ -62,159 +56,106 @@ describe('GET /users/:id', () => {
         expect(res.statusCode).toBe(200);
         expect(res.body).toStrictEqual(user);
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'GET', null);
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'GET');
     });
 
     it('should handle errors getting users by id', async () => {
-        const userId = '2';
+        const userIdErr = '2';
         makeRequest.mockRejectedValueOnce(new Error('User not found'));
 
         const res = await request(app)
-            .get(`/users/${userId}`)
+            .get(`/users/${userIdErr}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error getting user with id');
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'GET', null);
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userIdErr}`, 'GET');
     });
 });
 describe('POST /users', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
     it('should create a new user', async () => {
-        const newUser = {
-            name: 'myName',
-            email: 'test@example.com',
-            gender: 'male',
-            status: 'active',
-        };
         const createdUser = {
             id: '1',
-            ...newUser,
+            ...user2,
         };
         makeRequest.mockResolvedValueOnce(createdUser);
 
         const res = await request(app)
             .post('/users')
-            .send(newUser)
+            .send(user2)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(201);
         expect(res.body).toStrictEqual(createdUser);
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'POST', JSON.stringify(newUser));
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'POST', user2);
     });
 
     it('should handle errors create new user', async () => {
-        const newUser = {
-            name: 'myName',
-            email: 'test@example.com',
-            gender: 'male',
-            status: 'active',
-        };
         makeRequest.mockRejectedValueOnce(new Error('Create failed'));
 
         const res = await request(app)
             .post('/users')
-            .send(newUser)
+            .send(user2)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error creating user');
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'POST', JSON.stringify(newUser));
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users`, 'POST', user2);
     });
 });
 describe('PUT /users/:id', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
     it('should update user', async () => {
-        const id = 1;
-        const updatedUser = {
-            name: 'newName',
-            email: 'newEmail@example.com',
-            gender: 'female',
-            status: 'inactive',
-        };
-        makeRequest.mockResolvedValueOnce(updatedUser);
+        makeRequest.mockResolvedValueOnce(user2);
         const res = await request(app)
-            .put(`/users/${id}`)
-            .send(updatedUser)
+            .put(`/users/${userId}`)
+            .send(user2)
             .set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(200);
-        expect(res.body).toEqual(updatedUser);
+        expect(res.body).toEqual(user2);
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(
-            `${url}/users/${id}`,
-            'PUT',
-            JSON.stringify(updatedUser),
-        );
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'PUT', user2);
     });
     it('should handle errors update user', async () => {
-        const id = 1;
-        const updatedUser = {
-            name: 'newName',
-            email: 'newEmail@example.com',
-            gender: 'female',
-            status: 'inactive',
-        };
-
         makeRequest.mockRejectedValueOnce(new Error('Update failed'));
 
         const res = await request(app)
-            .put(`/users/${id}`)
-            .send(updatedUser)
+            .put(`/users/${userId}`)
+            .send(user2)
             .set('Authorization', `Bearer ${token}`);
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error updating user with id');
 
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(
-            `${url}/users/${id}`,
-            'PUT',
-            JSON.stringify(updatedUser),
-        );
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'PUT', user2);
     });
 });
 describe('DELETE /users/:id', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
     it('should delete a user by ID', async () => {
-        const uid = '1';
-        const user = {
-            id: uid,
-            name: 'myName',
-            email: 'test@example.com',
-            gender: 'male',
-            status: 'active',
-        };
         makeRequest.mockResolvedValueOnce(user);
 
         const res = await request(app)
-            .delete(`/users/${uid}`)
+            .delete(`/users/${userId}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(202);
         expect(res.text).toBe('User delete');
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${uid}`, 'DELETE', null);
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'DELETE');
     });
 
     it('should handle errors delete user', async () => {
-        const uid = '1';
         makeRequest.mockRejectedValueOnce(new Error('Network Error'));
 
         const res = await request(app)
-            .delete(`/users/${uid}`)
+            .delete(`/users/${userId}`)
             .set('Authorization', `Bearer ${token}`);
 
         expect(res.statusCode).toBe(500);
         expect(res.text).toBe('Error deleting user');
         expect(makeRequest).toHaveBeenCalledTimes(1);
-        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${uid}`, 'DELETE', null);
+        expect(makeRequest).toHaveBeenCalledWith(`${url}/users/${userId}`, 'DELETE');
     });
 });

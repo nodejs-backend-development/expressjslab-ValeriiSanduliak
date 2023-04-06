@@ -3,7 +3,7 @@ const { makeRequest } = require('../clients/httpClient');
 
 const getUsers = async (req, res) => {
     try {
-        const userData = await makeRequest(`${url}/users`, 'GET', null);
+        const userData = await makeRequest(`${url}/users`, 'GET');
         res.status(200).json(userData);
     } catch (error) {
         res.status(500).send('Error getting users');
@@ -13,7 +13,7 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
-        const userData = await makeRequest(`${url}/users/${id}`, 'GET', null);
+        const userData = await makeRequest(`${url}/users/${id}`, 'GET');
         res.status(200).json(userData);
     } catch (error) {
         res.status(500).send('Error getting user with id');
@@ -22,11 +22,12 @@ const getUserById = async (req, res) => {
 const createUser = async (req, res) => {
     try {
         const { name, email, gender, status } = req.body;
-        const userData = await makeRequest(
-            `${url}/users`,
-            'POST',
-            JSON.stringify({ name, email, gender, status }),
-        );
+        const userData = await makeRequest(`${url}/users`, 'POST', {
+            name,
+            email,
+            gender,
+            status,
+        });
         res.status(201).json(userData);
     } catch (error) {
         res.status(500).send('Error creating user');
@@ -37,11 +38,12 @@ const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, email, gender, status } = req.body;
-        const userData = await makeRequest(
-            `${url}/users/${id}`,
-            'PUT',
-            JSON.stringify({ name, email, gender, status }),
-        );
+        const userData = await makeRequest(`${url}/users/${id}`, 'PUT', {
+            name,
+            email,
+            gender,
+            status,
+        });
         res.status(200).json(userData);
     } catch (error) {
         res.status(500).send('Error updating user with id');
@@ -50,7 +52,7 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        await makeRequest(`${url}/users/${id}`, 'DELETE', null);
+        await makeRequest(`${url}/users/${id}`, 'DELETE');
         res.status(202).send('User delete');
     } catch (error) {
         res.status(500).send('Error deleting user');

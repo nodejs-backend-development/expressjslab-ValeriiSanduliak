@@ -1,6 +1,6 @@
 const { token } = require('../global_keys/keys');
 
-const makeRequest = async (url, method, body) => {
+const makeRequest = async (url, method, data = null) => {
     try {
         const response = await fetch(url, {
             method,
@@ -8,7 +8,7 @@ const makeRequest = async (url, method, body) => {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
             },
-            body,
+            body: data ? JSON.stringify(data) : null,
         });
         if (response.status === 204) {
             return null;
