@@ -1,36 +1,67 @@
-const users = [
-    {
-        id: 1,
-        firstName: 'FirstName1',
-        lastName: 'LastName1',
-        email: 'a1@b.com',
-    },
-    {
-        id: 2,
-        firstName: 'FirstName2',
-        lastName: 'LastName2',
-        email: 'a2@b.com',
-    },
-    {
-        id: 3,
-        firstName: 'FirstName3',
-        lastName: 'LastName3',
-        email: 'a3@b.com',
-    },
-];
+const { url } = require('../global_keys/keys');
+const { makeRequest } = require('../clients/httpClient');
 
 const getUsers = async (req, res) => {
-    res.status(200).json(users);
+    try {
+        const userData = await makeRequest(`${url}/users`, 'GET');
+        res.status(200).json(userData);
+    } catch (error) {
+        res.status(500).send('Error getting users');
+    }
 };
 
-const addUser = async (req, res) => {
-    const user = req.body;
-    user.id = users.length + 1;
-    users.push(user);
-    res.status(201).json(user);
+const getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userData = await makeRequest(`${url}/users/${id}`, 'GET');
+        res.status(200).json(userData);
+    } catch (error) {
+        res.status(500).send('Error getting user with id');
+    }
+};
+const createUser = async (req, res) => {
+    try {
+        const { name, email, gender, status } = req.body;
+        const userData = await makeRequest(`${url}/users`, 'POST', {
+            name,
+            email,
+            gender,
+            status,
+        });
+        res.status(201).json(userData);
+    } catch (error) {
+        res.status(500).send('Error creating user');
+    }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, gender, status } = req.body;
+        const userData = await makeRequest(`${url}/users/${id}`, 'PUT', {
+            name,
+            email,
+            gender,
+            status,
+        });
+        res.status(200).json(userData);
+    } catch (error) {
+        res.status(500).send('Error updating user with id');
+    }
+};
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await makeRequest(`${url}/users/${id}`, 'DELETE');
+        res.status(202).send('User delete');
+    } catch (error) {
+        res.status(500).send('Error deleting user');
+    }
+};
 module.exports = {
     getUsers,
-    addUser,
+    createUser,
+    getUserById,
+    updateUser,
+    deleteUser,
 };
